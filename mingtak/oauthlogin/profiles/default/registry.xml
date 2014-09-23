@@ -1,0 +1,9 @@
+<registry>
+    <records interface="mingtak.oauthlogin.oauth2login.IOauth2Setting" prefix="mingtak.oauthlogin.oauth2login.IOauth2Setting">
+        <!-- Set default values -->
+
+        <!-- Leave to empty string -->
+        <value key="testField"></value>
+        <value key="textField"></value>
+    </records>
+</registry>
