@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
 from Products.Five.browser import BrowserView
-#from ..config import PAGE_ACCESS_LOG_FILE
-#from DateTime import DateTime
 import logging
-#from Products.CMFPlone.utils import safe_unicode
 from plone import api
 from requests_oauthlib import OAuth2Session
 from requests_oauthlib.compliance_fixes import facebook_compliance_fix
@@ -11,11 +7,15 @@ import urllib2
 from zope.component import getUtility, queryUtility
 from plone.registry.interfaces import IRegistry
 from Products.CMFPlone.utils import safe_unicode
-import os; os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 from oauthlib.oauth2 import TokenExpiredError
-
+import os; os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 logger = logging.getLogger("mingtak.oauthlogin.browser.oauthLogin")
+
+
+#class OauthWorkFlow(object):
+
+
 
 
 class FacebookLogin(BrowserView):
@@ -95,28 +95,19 @@ class GoogleLogin(BrowserView):
             authorization_url, state = google.authorization_url(self.authorization_base_url)
             self.request.response.redirect(authorization_url)
             return
-        import pdb; pdb.set_trace()
-        """
-        google.fetch_token(self.token_url,
+        google.fetch_token(token_url=self.token_url,
                            client_secret=client_secret,
-                           code=code)
-        """
-        redirect_response = '%s?%s' % (self.request['ACTUAL_URL'], self.request['QUERY_STRING'])
-        google.fetch_token(self.token_url,
-                           client_secret=client_secret,
-                           authorization_response=redirect_response)
-
+                           code=code,)
         getUser = google.get('https://www.googleapis.com/oauth2/v1/userinfo')
         user = getUser.json()
+        """
         userinfo = ''
         for i in user.viewitems():
             userinfo += '%s : %s\n' % (i[0], i[1])
         return userinfo
-
-
-
+        """
         # check has id, if True, login
-        userid = safe_unicode("fb%s") % user["id"]
+        userid = safe_unicode("gg%s") % user["id"]
         if api.user.get(userid=userid) is not None:
             self.context.acl_users.session._setupSession(userid.encode("utf-8"), self.context.REQUEST.RESPONSE)
             self.request.RESPONSE.redirect("/")
@@ -124,13 +115,12 @@ class GoogleLogin(BrowserView):
 
         userInfo = dict(
             fullname=safe_unicode(user.get("name", "")),
-            description=safe_unicode(user.get("about", "")),
             location=safe_unicode(user.get("locale", "")),
             fbGender=safe_unicode(user.get("gender", "")),
             home_page=safe_unicode(user.get("link", "")),
         )
         api.user.create(
-            username=safe_unicode("fb%s") % user["id"],
+            username=userid,
             email=safe_unicode((user.get("email", ""))),
             properties=userInfo,
         )
