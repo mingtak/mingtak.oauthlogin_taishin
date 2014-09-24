@@ -10,5 +10,10 @@
     permission="zope2.View"
     class=".oauthLogin.FacebookLogin" />
 
+  <browser:page
+    for="*"
+    name="googleLogin"
+    permission="zope2.View"
+    class=".oauthLogin.GoogleLogin" />
 
 </configure>
