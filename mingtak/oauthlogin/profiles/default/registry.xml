@@ -1,17 +1,3 @@
 <registry>
-    <records interface="mingtak.oauthlogin.oauth2login.IOauth2Setting"
-             prefix="mingtak.oauthlogin.oauth2login.IOauth2Setting">
-        <!-- Set default values -->
-
-        <!-- Leave to empty string -->
-        <value key="allowList"></value>
-        <value key="facebookAppId"></value>
-        <value key="facebookAppSecret"></value>
-        <value key="facebookScope"></value>
-        <value key="facebookRedirectUri"></value>
-        <value key="googleAppId"></value>
-        <value key="googleAppSecret"></value>
-        <value key="googleScope"></value>
-        <value key="googleRedirectUri"></value>
-    </records>
+  <records interface="mingtak.oauthlogin.oauth2login.IOauth2Setting" />
 </registry>
