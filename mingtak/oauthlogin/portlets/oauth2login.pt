@@ -1,0 +1,3 @@
+<h1>hi, I'm oauth2login.pt</h1>
+<div tal:content="python:context.portal_registry['mingtak.oauthlogin.oauth2login.IOauth2Setting.allowList']">
+</div>

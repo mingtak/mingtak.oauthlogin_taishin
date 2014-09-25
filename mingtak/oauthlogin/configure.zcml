@@ -42,4 +42,5 @@
     permission="cmf.ManagePortal"
     class=".configlet.Oauth2LoginControlPanelView"
     />
+  <include package=".portlets" />
 </configure>
