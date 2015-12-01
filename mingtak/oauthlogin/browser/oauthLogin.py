@@ -9,6 +9,8 @@ from plone.registry.interfaces import IRegistry
 from Products.CMFPlone.utils import safe_unicode
 from oauthlib.oauth2 import TokenExpiredError
 import os; os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+from zope.event import notify
+from Products.PlonePAS.events import UserLoggedInEvent, UserInitialLoginInEvent
 
 
 logger = logging.getLogger("mingtak.oauthlogin.browser.oauthLogin")
@@ -37,8 +39,8 @@ class OauthWorkFlow(object):
         return getUser
 
     def createUser(self, userid, email, properties):
-        api.user.create(username=userid, email=email, properties=properties,)
-        return
+        userObject = api.user.create(username=userid, email=email, properties=properties,)
+        return userObject
 
 
 class FacebookLogin(BrowserView):
@@ -61,11 +63,19 @@ class FacebookLogin(BrowserView):
             return
         user = oauthWorkFlow.getUserInfo(facebook, self.token_url, client_secret, code, self.getUrl).json()
 
+
         # check has id, if True, is a relogin user, if False, is a new user
+
+
         userid = safe_unicode("fb%s") % user["id"]
+
+#########
+        userObject = api.user.get(userid=userid)
         if api.user.get(userid=userid) is not None:
             self.context.acl_users.session._setupSession(userid.encode("utf-8"), self.context.REQUEST.RESPONSE)
             self.request.RESPONSE.redirect("/")
+#########
+            notify(UserLoggedInEvent(userObject))
             return
         userInfo = dict(
             fullname=safe_unicode(user.get("name", "")),
@@ -74,9 +84,10 @@ class FacebookLogin(BrowserView):
             fbGender=safe_unicode(user.get("gender", "")),
             home_page=safe_unicode(user.get("link", "")),
         )
-        oauthWorkFlow.createUser(userid, safe_unicode((user.get("email", ""))), userInfo)
-        self.context.acl_users.session._setupSession(userid.encode("utf-8"), self.context.REQUEST.RESPONSE)
-        self.request.RESPONSE.redirect("/")
+        userObject = oauthWorkFlow.createUser(userid, safe_unicode((user.get("email", ""))), userInfo)
+#        self.context.acl_users.session._setupSession(userid.encode("utf-8"), self.context.REQUEST.RESPONSE)
+#        self.request.RESPONSE.redirect("/")
+        notify(UserInitialLoginInEvent(userObject))
         return
 
 
